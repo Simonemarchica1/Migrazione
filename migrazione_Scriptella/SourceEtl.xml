@@ -1,0 +1,37 @@
+<project name="SourceEtl" default="run-etl" basedir=".">
+    <taskdef resource="antscriptella.properties">
+        <classpath>
+            <pathelement location="libs/scriptella.jar"/>
+            <pathelement location="libs/commons-compiler-3.0.16.jar"/>
+            <pathelement location="libs/janino-3.0.16.jar"/>
+            <pathelement location="libs/mssql-jdbc-12.8.1.jre11.jar"/>
+            <pathelement location="libs/"/>
+            <pathelement location="libs/commons-jexl3-3-4-0.jar"/>
+        </classpath>
+    </taskdef>
+
+    <target name="etl-csv-to-db">
+        <echo message="Esecuzione EtlCsvToDb.xml"/>
+        <etl file="etl/EtlCsvToDb.xml"/>
+    </target>
+
+    <!-- Target per il secondo processo, dipendente dal primo -->
+    <target name="etl-db-to-csv" depends="etl-csv-to-db">
+        <echo message="Esecuzione EtlDbToCsv.xml"/>
+        <etl file="etl/EtlDbToCsv.xml"/>
+    </target>
+
+    <!-- Target per il terzo processo, dipendente dal secondo -->
+    <target name="etl-file-corrector" depends="etl-db-to-csv">
+        <echo message="Esecuzione EtlFileCorrector.xml"/>
+        <etl file="etl/EtlFileCorrector.xml"/>
+    </target>
+    <target name="run-all" depends="etl-csv-to-db, etl-db-to-csv, etl-file-corrector">
+        <echo message="Tutti i processi sono stati eseguiti correttamente."/>
+    </target>
+</project>
+
+
+
+
+
